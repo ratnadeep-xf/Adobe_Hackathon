@@ -1,0 +1,323 @@
+﻿{
+  "site": "wise.com",
+  "audited_at": "2026-09-12T20:33:06Z",
+  "summary": {
+    "total_findings": 1,
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "JSON-LD is generic-only or inconsistent with page purpose",
+      "severity": "medium",
+      "evidence": "generic-only types site-wide: ['Organization'] (generic=['Organization']; domain-specific=[]). Per page: https://wise.com/ blocks=1 types=['Organization'].",
+      "suggested_action": {
+        "summary": "Add a domain-specific @type that matches what the page is, rather than only Organization/WebSite chrome.",
+        "priority": "medium"
+      }
+    }
+  ],
+  "coverage": {
+    "homepage_fetch_quality": {
+      "url": "https://wise.com/",
+      "status": 200,
+      "usable": true,
+      "class": "usable",
+      "reason": "usable content",
+      "word_count": 1320,
+      "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+    },
+    "preferred_locale": "",
+    "sampled_internal_urls": [],
+    "sampled_page_count": 0,
+    "path_classes": {
+      "https://wise.com/": "key"
+    },
+    "check_notes": {
+      "D3": {
+        "status": "clear",
+        "reason": "homepage was reachable",
+        "skill": "crawl-render-audit"
+      },
+      "FQ": {
+        "status": "clear",
+        "reason": "homepage fetch classified as usable content",
+        "skill": "crawl-render-audit"
+      },
+      "D1": {
+        "status": "clear",
+        "reason": "User-agent: * does not Disallow: /",
+        "skill": "crawl-render-audit"
+      },
+      "D2": {
+        "status": "clear",
+        "reason": "no catalogued live-agent or training-crawler is root-disallowed",
+        "skill": "crawl-render-audit"
+      },
+      "D4": {
+        "status": "clear",
+        "reason": "a valid sitemap document was retrieved",
+        "skill": "crawl-render-audit"
+      },
+      "D5": {
+        "status": "clear",
+        "reason": "1 page(s) scored; none flagged as a JS-shell",
+        "skill": "crawl-render-audit"
+      },
+      "D6": {
+        "status": "skipped",
+        "reason": "no internal URLs were sampled",
+        "skill": "crawl-render-audit"
+      },
+      "D7": {
+        "status": "clear",
+        "reason": "homepage and sampled key pages have at least one JSON-LD block",
+        "skill": "structured-data-audit"
+      },
+      "D8": {
+        "status": "fired",
+        "reason": "generic-only types site-wide: ['Organization'] (generic=['Organization']; domain-specific=[])",
+        "skill": "structured-data-audit"
+      },
+      "D9": {
+        "status": "clear",
+        "reason": "7 distinct search domains; footprint threshold met",
+        "skill": "freshness-corroboration"
+      },
+      "D10": {
+        "status": "clear",
+        "reason": "official host wise.com present in the search-domain list",
+        "skill": "freshness-corroboration"
+      },
+      "D11": {
+        "status": "clear",
+        "reason": "source buckets represented: ['official', 'reference', 'social', 'other']",
+        "skill": "freshness-corroboration"
+      },
+      "D12": {
+        "status": "no_signal",
+        "reason": "no checkable on-site facts (founding year / headquarters) extracted",
+        "skill": "freshness-corroboration"
+      },
+      "D13": {
+        "status": "no_signal",
+        "reason": "no copyright year found on the homepage",
+        "skill": "freshness-corroboration"
+      },
+      "D14": {
+        "status": "clear",
+        "reason": "site and search summaries share content tokens ['account', 'borders', 'countries', 'currencies', 'international', 'local', 'manage', 'money']",
+        "skill": "entity-clarity-audit"
+      },
+      "D15": {
+        "status": "clear",
+        "reason": "fetch reached the origin; domain-vs-business divergence not indicated",
+        "skill": "entity-clarity-audit"
+      },
+      "E1": {
+        "status": "clear",
+        "reason": "concrete offering signal(s): ['Wise', 'account', 'Money', 'without']",
+        "skill": "engagement-audit"
+      },
+      "E2": {
+        "status": "clear",
+        "reason": "meta description names a concrete offering",
+        "skill": "engagement-audit"
+      },
+      "E3": {
+        "status": "clear",
+        "reason": "exactly one H1: 'Send and spend money worldwide'",
+        "skill": "engagement-audit"
+      }
+    },
+    "skipped_checks": [
+      "D6"
+    ],
+    "skills": {
+      "crawl-render-audit": {
+        "d5": "homepage_only",
+        "skipped_checks": [
+          "D6"
+        ],
+        "check_notes": {
+          "D3": {
+            "status": "clear",
+            "reason": "homepage was reachable"
+          },
+          "FQ": {
+            "status": "clear",
+            "reason": "homepage fetch classified as usable content"
+          },
+          "D1": {
+            "status": "clear",
+            "reason": "User-agent: * does not Disallow: /"
+          },
+          "D2": {
+            "status": "clear",
+            "reason": "no catalogued live-agent or training-crawler is root-disallowed"
+          },
+          "D4": {
+            "status": "clear",
+            "reason": "a valid sitemap document was retrieved"
+          },
+          "D5": {
+            "status": "clear",
+            "reason": "1 page(s) scored; none flagged as a JS-shell"
+          },
+          "D6": {
+            "status": "skipped",
+            "reason": "no internal URLs were sampled"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://wise.com/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 1320,
+          "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+        },
+        "preferred_locale": "",
+        "sampled_internal_urls": [],
+        "page_scores": [
+          {
+            "word_count": 1320,
+            "visible_text_chars": 8043,
+            "raw_html_chars": 645346,
+            "text_to_html_ratio": 0.0125,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://wise.com/",
+            "status": 200,
+            "path_class": "key"
+          }
+        ],
+        "robots_parse": {
+          "wildcard_root_disallow": false,
+          "sitemaps_declared": [
+            "https://wise.com/sitemap"
+          ],
+          "d2": {
+            "blocked_training_crawlers": [],
+            "blocked_live_agents": []
+          }
+        }
+      },
+      "structured-data-audit": {
+        "pages": "homepage_only",
+        "skipped_checks": [],
+        "check_notes": {
+          "D7": {
+            "status": "clear",
+            "reason": "homepage and sampled key pages have at least one JSON-LD block"
+          },
+          "D8": {
+            "status": "fired",
+            "reason": "generic-only types site-wide: ['Organization'] (generic=['Organization']; domain-specific=[])"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://wise.com/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 1320,
+          "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+        }
+      },
+      "freshness-corroboration": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D9": {
+            "status": "clear",
+            "reason": "7 distinct search domains; footprint threshold met"
+          },
+          "D10": {
+            "status": "clear",
+            "reason": "official host wise.com present in the search-domain list"
+          },
+          "D11": {
+            "status": "clear",
+            "reason": "source buckets represented: ['official', 'reference', 'social', 'other']"
+          },
+          "D12": {
+            "status": "no_signal",
+            "reason": "no checkable on-site facts (founding year / headquarters) extracted"
+          },
+          "D13": {
+            "status": "no_signal",
+            "reason": "no copyright year found on the homepage"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://wise.com/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 1320,
+          "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+        }
+      },
+      "entity-clarity-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D14": {
+            "status": "clear",
+            "reason": "site and search summaries share content tokens ['account', 'borders', 'countries', 'currencies', 'international', 'local', 'manage', 'money']"
+          },
+          "D15": {
+            "status": "clear",
+            "reason": "fetch reached the origin; domain-vs-business divergence not indicated"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://wise.com/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 1320,
+          "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+        }
+      },
+      "engagement-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "E1": {
+            "status": "clear",
+            "reason": "concrete offering signal(s): ['Wise', 'account', 'Money', 'without']"
+          },
+          "E2": {
+            "status": "clear",
+            "reason": "meta description names a concrete offering"
+          },
+          "E3": {
+            "status": "clear",
+            "reason": "exactly one H1: 'Send and spend money worldwide'"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://wise.com/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 1320,
+          "preview": "Wise: The international account | Money without borders | Wise India Skip to content Personal Wise Account The international account for sending, spending and c"
+        }
+      }
+    },
+    "brand_used": "Wise"
+  }
+}

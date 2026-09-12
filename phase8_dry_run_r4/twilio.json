@@ -1,0 +1,414 @@
+﻿{
+  "site": "twilio.com",
+  "audited_at": "2026-09-12T20:40:16Z",
+  "summary": {
+    "total_findings": 1,
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "JSON-LD missing on key subpages",
+      "severity": "medium",
+      "evidence": "Homepage has 3 JSON-LD block(s) (['Organization', 'WebSite', 'VideoObject']), but key subpages have none: https://www.twilio.com/en-us/solutions blocks=0.",
+      "suggested_action": {
+        "summary": "Add schema.org JSON-LD on the key subpages that describe the offering, not only the homepage. Use types that match what those pages actually describe.",
+        "priority": "medium"
+      }
+    }
+  ],
+  "coverage": {
+    "homepage_fetch_quality": {
+      "url": "https://www.twilio.com/en-us",
+      "status": 200,
+      "usable": true,
+      "class": "usable",
+      "reason": "usable content",
+      "word_count": 2061,
+      "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+    },
+    "preferred_locale": "en-us",
+    "sampled_internal_urls": [
+      "https://www.twilio.com/en-us/solutions",
+      "https://www.twilio.com/en-us/user-authentication-identity",
+      "https://www.twilio.com/en-us/report/gartner-mq-cpaas-2024",
+      "https://www.twilio.com/en-us/errors",
+      "https://www.twilio.com/en-us/speech-recognition"
+    ],
+    "sampled_page_count": 5,
+    "path_classes": {
+      "https://www.twilio.com/en-us": "key",
+      "https://www.twilio.com/en-us/solutions": "key",
+      "https://www.twilio.com/en-us/user-authentication-identity": "marginal",
+      "https://www.twilio.com/en-us/report/gartner-mq-cpaas-2024": "marginal",
+      "https://www.twilio.com/en-us/errors": "marginal",
+      "https://www.twilio.com/en-us/speech-recognition": "marginal"
+    },
+    "check_notes": {
+      "D3": {
+        "status": "clear",
+        "reason": "homepage was reachable",
+        "skill": "crawl-render-audit"
+      },
+      "FQ": {
+        "status": "clear",
+        "reason": "homepage fetch classified as usable content",
+        "skill": "crawl-render-audit"
+      },
+      "D1": {
+        "status": "clear",
+        "reason": "User-agent: * does not Disallow: /",
+        "skill": "crawl-render-audit"
+      },
+      "D2": {
+        "status": "clear",
+        "reason": "no catalogued live-agent or training-crawler is root-disallowed",
+        "skill": "crawl-render-audit"
+      },
+      "D4": {
+        "status": "clear",
+        "reason": "a valid sitemap document was retrieved",
+        "skill": "crawl-render-audit"
+      },
+      "D5": {
+        "status": "clear",
+        "reason": "6 page(s) scored; none flagged as a JS-shell",
+        "skill": "crawl-render-audit"
+      },
+      "D6": {
+        "status": "clear",
+        "reason": "5 sampled internal page(s); none returned 401/403",
+        "skill": "crawl-render-audit"
+      },
+      "D7": {
+        "status": "fired",
+        "reason": "key subpages missing JSON-LD: https://www.twilio.com/en-us/solutions blocks=0",
+        "skill": "structured-data-audit"
+      },
+      "D8": {
+        "status": "clear",
+        "reason": "domain-specific types present: ['VideoObject', 'ItemPage', 'SoftwareApplication']; no path-family mismatch",
+        "skill": "structured-data-audit"
+      },
+      "D9": {
+        "status": "clear",
+        "reason": "6 distinct search domains; footprint threshold met",
+        "skill": "freshness-corroboration"
+      },
+      "D10": {
+        "status": "clear",
+        "reason": "official eTLD+1 matched search domain 'twilio.com' (audited host twilio.com)",
+        "skill": "freshness-corroboration"
+      },
+      "D11": {
+        "status": "clear",
+        "reason": "source buckets represented: ['official', 'reference', 'other']",
+        "skill": "freshness-corroboration"
+      },
+      "D12": {
+        "status": "no_signal",
+        "reason": "no checkable on-site facts (founding year / headquarters) extracted",
+        "skill": "freshness-corroboration"
+      },
+      "D13": {
+        "status": "clear",
+        "reason": "copyright year 2026 is within two years of 2026",
+        "skill": "freshness-corroboration"
+      },
+      "D14": {
+        "status": "clear",
+        "reason": "site and search summaries share content tokens ['amazing', 'build', 'conversational', 'customer', 'email', 'engagement', 'experiences', 'identity']",
+        "skill": "entity-clarity-audit"
+      },
+      "D15": {
+        "status": "clear",
+        "reason": "fetch reached the origin; domain-vs-business divergence not indicated",
+        "skill": "entity-clarity-audit"
+      },
+      "E1": {
+        "status": "clear",
+        "reason": "concrete offering signal(s): ['platform for', 'Conversational', 'APIs', 'Email']",
+        "skill": "engagement-audit"
+      },
+      "E2": {
+        "status": "clear",
+        "reason": "meta description names a concrete offering",
+        "skill": "engagement-audit"
+      },
+      "E3": {
+        "status": "clear",
+        "reason": "exactly one H1: 'The platform for conversations in the AI era'",
+        "skill": "engagement-audit"
+      }
+    },
+    "skipped_checks": [],
+    "skills": {
+      "crawl-render-audit": {
+        "d5": "homepage_and_internal",
+        "skipped_checks": [],
+        "check_notes": {
+          "D3": {
+            "status": "clear",
+            "reason": "homepage was reachable"
+          },
+          "FQ": {
+            "status": "clear",
+            "reason": "homepage fetch classified as usable content"
+          },
+          "D1": {
+            "status": "clear",
+            "reason": "User-agent: * does not Disallow: /"
+          },
+          "D2": {
+            "status": "clear",
+            "reason": "no catalogued live-agent or training-crawler is root-disallowed"
+          },
+          "D4": {
+            "status": "clear",
+            "reason": "a valid sitemap document was retrieved"
+          },
+          "D5": {
+            "status": "clear",
+            "reason": "6 page(s) scored; none flagged as a JS-shell"
+          },
+          "D6": {
+            "status": "clear",
+            "reason": "5 sampled internal page(s); none returned 401/403"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.twilio.com/en-us",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 2061,
+          "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+        },
+        "preferred_locale": "en-us",
+        "sampled_internal_urls": [
+          "https://www.twilio.com/en-us/solutions",
+          "https://www.twilio.com/en-us/user-authentication-identity",
+          "https://www.twilio.com/en-us/report/gartner-mq-cpaas-2024",
+          "https://www.twilio.com/en-us/errors",
+          "https://www.twilio.com/en-us/speech-recognition"
+        ],
+        "page_scores": [
+          {
+            "word_count": 2061,
+            "visible_text_chars": 16798,
+            "raw_html_chars": 706207,
+            "text_to_html_ratio": 0.0238,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us",
+            "status": 200,
+            "path_class": "key"
+          },
+          {
+            "word_count": 1736,
+            "visible_text_chars": 12680,
+            "raw_html_chars": 617710,
+            "text_to_html_ratio": 0.0205,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us/solutions",
+            "status": 200,
+            "path_class": "key"
+          },
+          {
+            "word_count": 1886,
+            "visible_text_chars": 13767,
+            "raw_html_chars": 659565,
+            "text_to_html_ratio": 0.0209,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us/user-authentication-identity",
+            "status": 200,
+            "path_class": "marginal"
+          },
+          {
+            "word_count": 1468,
+            "visible_text_chars": 10688,
+            "raw_html_chars": 571245,
+            "text_to_html_ratio": 0.0187,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us/report/gartner-mq-cpaas-2024",
+            "status": 200,
+            "path_class": "marginal"
+          },
+          {
+            "word_count": 947,
+            "visible_text_chars": 7180,
+            "raw_html_chars": 555085,
+            "text_to_html_ratio": 0.0129,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us/errors",
+            "status": 200,
+            "path_class": "marginal"
+          },
+          {
+            "word_count": 1503,
+            "visible_text_chars": 10985,
+            "raw_html_chars": 617149,
+            "text_to_html_ratio": 0.0178,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.twilio.com/en-us/speech-recognition",
+            "status": 200,
+            "path_class": "marginal"
+          }
+        ],
+        "robots_parse": {
+          "wildcard_root_disallow": false,
+          "sitemaps_declared": [],
+          "d2": {
+            "blocked_training_crawlers": [],
+            "blocked_live_agents": []
+          }
+        }
+      },
+      "structured-data-audit": {
+        "pages": "homepage_and_internal",
+        "skipped_checks": [],
+        "check_notes": {
+          "D7": {
+            "status": "fired",
+            "reason": "key subpages missing JSON-LD: https://www.twilio.com/en-us/solutions blocks=0"
+          },
+          "D8": {
+            "status": "clear",
+            "reason": "domain-specific types present: ['VideoObject', 'ItemPage', 'SoftwareApplication']; no path-family mismatch"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.twilio.com/en-us",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 2061,
+          "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+        }
+      },
+      "freshness-corroboration": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D9": {
+            "status": "clear",
+            "reason": "6 distinct search domains; footprint threshold met"
+          },
+          "D10": {
+            "status": "clear",
+            "reason": "official eTLD+1 matched search domain 'twilio.com' (audited host twilio.com)"
+          },
+          "D11": {
+            "status": "clear",
+            "reason": "source buckets represented: ['official', 'reference', 'other']"
+          },
+          "D12": {
+            "status": "no_signal",
+            "reason": "no checkable on-site facts (founding year / headquarters) extracted"
+          },
+          "D13": {
+            "status": "clear",
+            "reason": "copyright year 2026 is within two years of 2026"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.twilio.com/en-us",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 2061,
+          "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+        }
+      },
+      "entity-clarity-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D14": {
+            "status": "clear",
+            "reason": "site and search summaries share content tokens ['amazing', 'build', 'conversational', 'customer', 'email', 'engagement', 'experiences', 'identity']"
+          },
+          "D15": {
+            "status": "clear",
+            "reason": "fetch reached the origin; domain-vs-business divergence not indicated"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.twilio.com/en-us",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 2061,
+          "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+        }
+      },
+      "engagement-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "E1": {
+            "status": "clear",
+            "reason": "concrete offering signal(s): ['platform for', 'Conversational', 'APIs', 'Email']"
+          },
+          "E2": {
+            "status": "clear",
+            "reason": "meta description names a concrete offering"
+          },
+          "E3": {
+            "status": "clear",
+            "reason": "exactly one H1: 'The platform for conversations in the AI era'"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.twilio.com/en-us",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 2061,
+          "preview": "Conversational AI and APIs for SMS, Email, Voice | Twilio English English French German Japanese Portuguese Spanish Support Help Center Support Plans Partner So"
+        }
+      }
+    },
+    "brand_used": "Twilio"
+  }
+}

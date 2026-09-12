@@ -1,0 +1,353 @@
+﻿{
+  "site": "patagonia.com",
+  "audited_at": "2026-09-12T20:40:01Z",
+  "summary": {
+    "total_findings": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "Homepage fetch did not return usable page content",
+      "severity": "medium",
+      "evidence": "Fetch classified as error (HTTP 404 stub); status=404; preview='Not found'. On-page identity and engagement checks were not run against this body.",
+      "suggested_action": {
+        "summary": "This fetch received an error stub or bot-check page, not the real homepage. Retry from a normal browser session or allow simple HTTP clients; do not treat this as a fact about the brand's content or identity.",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "F-002",
+      "title": "Named AI-crawler block in robots.txt",
+      "severity": "medium",
+      "evidence": "Named AI user-agents root-disallowed in https://www.patagonia.com/robots.txt. live-agent=[]; training-crawler=['Google-Extended'].",
+      "suggested_action": {
+        "summary": "Training-crawler user-agents are root-disallowed. If that is an intentional training opt-out, no change is required for live citation.",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "F-003",
+      "title": "Sitemap missing or unreachable",
+      "severity": "medium",
+      "evidence": "No valid sitemap document was retrieved. Checked: https://www.patagonia.com/sitemap_index.xml (source=robots.txt, status=404, valid=False); https://www.patagonia.com/actionworks/sitemap_index.xml (source=robots.txt, status=404, valid=False); https://www.patagonia.com/sitemap.xml (source=default /sitemap.xml, status=404, valid=False)",
+      "suggested_action": {
+        "summary": "No sitemap document was reachable at the declared or default locations from this fetch. If one is published, declare it with a Sitemap: line in robots.txt and ensure that URL returns XML.",
+        "priority": "medium"
+      }
+    }
+  ],
+  "coverage": {
+    "homepage_fetch_quality": {
+      "url": "https://www.patagonia.com/",
+      "status": 404,
+      "usable": false,
+      "class": "error",
+      "reason": "HTTP 404 stub",
+      "word_count": 2,
+      "preview": "Not found"
+    },
+    "preferred_locale": "",
+    "sampled_internal_urls": [],
+    "sampled_page_count": 0,
+    "path_classes": {},
+    "check_notes": {
+      "FQ": {
+        "status": "fired",
+        "reason": "error: HTTP 404 stub",
+        "skill": "crawl-render-audit"
+      },
+      "D3": {
+        "status": "clear",
+        "reason": "homepage was reachable; fetch-quality is not a hard block",
+        "skill": "crawl-render-audit"
+      },
+      "D1": {
+        "status": "clear",
+        "reason": "User-agent: * does not Disallow: /",
+        "skill": "crawl-render-audit"
+      },
+      "D2": {
+        "status": "fired",
+        "reason": "Named AI user-agents root-disallowed in https://www.patagonia.com/robots.txt. live-agent=[]; training-crawler=['Google-Extended'].",
+        "skill": "crawl-render-audit"
+      },
+      "D4": {
+        "status": "fired",
+        "reason": "No valid sitemap document was retrieved. Checked: https://www.patagonia.com/sitemap_index.xml (source=robots.txt, status=404, valid=False); https://www.patagonia.com/actionworks/sitemap_index.xml (source=robots.txt, status=404, valid=False)",
+        "skill": "crawl-render-audit"
+      },
+      "D5": {
+        "status": "skipped",
+        "reason": "no HTML page could be scored",
+        "skill": "crawl-render-audit"
+      },
+      "D6": {
+        "status": "skipped",
+        "reason": "no internal URLs were sampled",
+        "skill": "crawl-render-audit"
+      },
+      "D7": {
+        "status": "skipped",
+        "reason": "no scorable HTML pages",
+        "skill": "structured-data-audit"
+      },
+      "D8": {
+        "status": "skipped",
+        "reason": "no scorable HTML pages",
+        "skill": "structured-data-audit"
+      },
+      "D9": {
+        "status": "clear",
+        "reason": "6 distinct search domains; footprint threshold met",
+        "skill": "freshness-corroboration"
+      },
+      "D10": {
+        "status": "clear",
+        "reason": "official eTLD+1 matched search domain 'patagonia.com' (audited host patagonia.com)",
+        "skill": "freshness-corroboration"
+      },
+      "D11": {
+        "status": "clear",
+        "reason": "source buckets represented: ['official', 'reference', 'social', 'other']",
+        "skill": "freshness-corroboration"
+      },
+      "D12": {
+        "status": "skipped",
+        "reason": "homepage fetch is not usable content; on-site facts not extracted",
+        "skill": "freshness-corroboration"
+      },
+      "D13": {
+        "status": "skipped",
+        "reason": "homepage fetch is not usable content; copyright year not scored",
+        "skill": "freshness-corroboration"
+      },
+      "D14": {
+        "status": "skipped",
+        "reason": "homepage fetch is error; site text is not the brand self-description",
+        "skill": "entity-clarity-audit"
+      },
+      "D15": {
+        "status": "clear",
+        "reason": "fetch reached the origin; domain-vs-business divergence not indicated",
+        "skill": "entity-clarity-audit"
+      },
+      "E1": {
+        "status": "skipped",
+        "reason": "homepage fetch is not usable content; orientation not scored",
+        "skill": "engagement-audit"
+      },
+      "E2": {
+        "status": "skipped",
+        "reason": "homepage fetch is not usable content; meta not scored",
+        "skill": "engagement-audit"
+      },
+      "E3": {
+        "status": "skipped",
+        "reason": "homepage fetch is not usable content; H1 not scored",
+        "skill": "engagement-audit"
+      }
+    },
+    "skipped_checks": [
+      "D5",
+      "D6",
+      "D7",
+      "D8",
+      "D12",
+      "D13",
+      "D14",
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "skills": {
+      "crawl-render-audit": {
+        "d5": "none",
+        "skipped_checks": [
+          "D5",
+          "D6"
+        ],
+        "check_notes": {
+          "FQ": {
+            "status": "fired",
+            "reason": "error: HTTP 404 stub"
+          },
+          "D3": {
+            "status": "clear",
+            "reason": "homepage was reachable; fetch-quality is not a hard block"
+          },
+          "D1": {
+            "status": "clear",
+            "reason": "User-agent: * does not Disallow: /"
+          },
+          "D2": {
+            "status": "fired",
+            "reason": "Named AI user-agents root-disallowed in https://www.patagonia.com/robots.txt. live-agent=[]; training-crawler=['Google-Extended']."
+          },
+          "D4": {
+            "status": "fired",
+            "reason": "No valid sitemap document was retrieved. Checked: https://www.patagonia.com/sitemap_index.xml (source=robots.txt, status=404, valid=False); https://www.patagonia.com/actionworks/sitemap_index.xml (source=robots.txt, status=404, valid=False)"
+          },
+          "D5": {
+            "status": "skipped",
+            "reason": "no HTML page could be scored"
+          },
+          "D6": {
+            "status": "skipped",
+            "reason": "no internal URLs were sampled"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.patagonia.com/",
+          "status": 404,
+          "usable": false,
+          "class": "error",
+          "reason": "HTTP 404 stub",
+          "word_count": 2,
+          "preview": "Not found"
+        },
+        "preferred_locale": "",
+        "sampled_internal_urls": [],
+        "page_scores": [],
+        "robots_parse": {
+          "wildcard_root_disallow": false,
+          "sitemaps_declared": [
+            "https://www.patagonia.com/sitemap_index.xml",
+            "https://www.patagonia.com/actionworks/sitemap_index.xml"
+          ],
+          "d2": {
+            "blocked_training_crawlers": [
+              {
+                "user_agent": "Google-Extended",
+                "quoted_rule": "Disallow: /",
+                "matched_via": "named"
+              }
+            ],
+            "blocked_live_agents": []
+          }
+        }
+      },
+      "structured-data-audit": {
+        "pages": "none",
+        "skipped_checks": [
+          "D7",
+          "D8"
+        ],
+        "check_notes": {
+          "D7": {
+            "status": "skipped",
+            "reason": "no scorable HTML pages"
+          },
+          "D8": {
+            "status": "skipped",
+            "reason": "no scorable HTML pages"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.patagonia.com/",
+          "status": 404,
+          "usable": false,
+          "class": "error",
+          "reason": "HTTP 404 stub",
+          "word_count": 2,
+          "preview": "Not found"
+        }
+      },
+      "freshness-corroboration": {
+        "skipped_checks": [
+          "D12",
+          "D13"
+        ],
+        "check_notes": {
+          "D9": {
+            "status": "clear",
+            "reason": "6 distinct search domains; footprint threshold met"
+          },
+          "D10": {
+            "status": "clear",
+            "reason": "official eTLD+1 matched search domain 'patagonia.com' (audited host patagonia.com)"
+          },
+          "D11": {
+            "status": "clear",
+            "reason": "source buckets represented: ['official', 'reference', 'social', 'other']"
+          },
+          "D12": {
+            "status": "skipped",
+            "reason": "homepage fetch is not usable content; on-site facts not extracted"
+          },
+          "D13": {
+            "status": "skipped",
+            "reason": "homepage fetch is not usable content; copyright year not scored"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.patagonia.com/",
+          "status": 404,
+          "usable": false,
+          "class": "error",
+          "reason": "HTTP 404 stub",
+          "word_count": 2,
+          "preview": "Not found"
+        }
+      },
+      "entity-clarity-audit": {
+        "skipped_checks": [
+          "D14"
+        ],
+        "check_notes": {
+          "D14": {
+            "status": "skipped",
+            "reason": "homepage fetch is error; site text is not the brand self-description"
+          },
+          "D15": {
+            "status": "clear",
+            "reason": "fetch reached the origin; domain-vs-business divergence not indicated"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.patagonia.com/",
+          "status": 404,
+          "usable": false,
+          "class": "error",
+          "reason": "HTTP 404 stub",
+          "word_count": 2,
+          "preview": "Not found"
+        }
+      },
+      "engagement-audit": {
+        "skipped_checks": [
+          "E1",
+          "E2",
+          "E3"
+        ],
+        "check_notes": {
+          "E1": {
+            "status": "skipped",
+            "reason": "homepage fetch is not usable content; orientation not scored"
+          },
+          "E2": {
+            "status": "skipped",
+            "reason": "homepage fetch is not usable content; meta not scored"
+          },
+          "E3": {
+            "status": "skipped",
+            "reason": "homepage fetch is not usable content; H1 not scored"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.patagonia.com/",
+          "status": 404,
+          "usable": false,
+          "class": "error",
+          "reason": "HTTP 404 stub",
+          "word_count": 2,
+          "preview": "Not found"
+        }
+      }
+    },
+    "brand_used": "Patagonia"
+  }
+}

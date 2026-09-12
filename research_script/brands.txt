@@ -1,0 +1,26 @@
+# Phase 1 ground-truth brands — one per line, "Brand Name, domain.com".
+# Matches sites.txt so you can cross-reference the two CSVs afterward.
+# Swap/add freely — nothing here is used for grading.
+
+Allbirds, allbirds.com
+Chewy, chewy.com
+Glossier, glossier.com
+REI, rei.com
+Notion, notion.com
+Stripe, stripe.com
+Mailchimp, mailchimp.com
+Airtable, airtable.com
+Linear, linear.app
+The Plumber Austin TX, theplumberaustintx.com
+Abacus Plumbing, abacusplumbing.com
+Zamscapes, zamscapes.com
+Brooklyn Roasting Company, brooklynroasting.com
+The Verge, theverge.com
+Serious Eats, seriouseats.com
+Stratechery, stratechery.com
+Gong, gong.io
+Zendesk, zendesk.com
+Figma, figma.com
+HubSpot, hubspot.com
+Modern Coffee Co, moderncoffeeco.com
+The Hungry Mouse, thehungrymouse.com

@@ -1,0 +1,349 @@
+﻿{
+  "site": "who.int",
+  "audited_at": "2026-09-12T20:33:12Z",
+  "summary": {
+    "total_findings": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "title": "Named AI-crawler block in robots.txt",
+      "severity": "medium",
+      "evidence": "Named AI user-agents root-disallowed in https://who.int/robots.txt. live-agent=[]; training-crawler=['CCBot'].",
+      "suggested_action": {
+        "summary": "Training-crawler user-agents are root-disallowed. If that is an intentional training opt-out, no change is required for live citation.",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "F-002",
+      "title": "Sitemap missing or unreachable",
+      "severity": "medium",
+      "evidence": "No valid sitemap document was retrieved. Checked: http://www.who.int/sitemaps/sitemapindex.xml (source=robots.txt, status=406, valid=False); https://who.int/sitemap.xml (source=default /sitemap.xml, status=None, valid=False)",
+      "suggested_action": {
+        "summary": "No sitemap document was reachable at the declared or default locations from this fetch. If one is published, declare it with a Sitemap: line in robots.txt and ensure that URL returns XML.",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "F-003",
+      "title": "JSON-LD is generic-only or inconsistent with page purpose",
+      "severity": "medium",
+      "evidence": "generic-only types site-wide: ['WebSite', 'Organization', 'WebPage'] (generic=['WebSite', 'Organization', 'WebPage']; domain-specific=[]). Per page: https://www.who.int/ blocks=3 types=['WebSite', 'Organization', 'WebPage'].",
+      "suggested_action": {
+        "summary": "Add a domain-specific @type that matches what the page is, rather than only Organization/WebSite chrome.",
+        "priority": "medium"
+      }
+    }
+  ],
+  "coverage": {
+    "homepage_fetch_quality": {
+      "url": "https://www.who.int/",
+      "status": 200,
+      "usable": true,
+      "class": "usable",
+      "reason": "usable content",
+      "word_count": 646,
+      "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+    },
+    "preferred_locale": "",
+    "sampled_internal_urls": [],
+    "sampled_page_count": 0,
+    "path_classes": {
+      "https://www.who.int/": "key"
+    },
+    "check_notes": {
+      "D3": {
+        "status": "clear",
+        "reason": "homepage was reachable",
+        "skill": "crawl-render-audit"
+      },
+      "FQ": {
+        "status": "clear",
+        "reason": "homepage fetch classified as usable content",
+        "skill": "crawl-render-audit"
+      },
+      "D1": {
+        "status": "clear",
+        "reason": "User-agent: * does not Disallow: /",
+        "skill": "crawl-render-audit"
+      },
+      "D2": {
+        "status": "fired",
+        "reason": "Named AI user-agents root-disallowed in https://who.int/robots.txt. live-agent=[]; training-crawler=['CCBot'].",
+        "skill": "crawl-render-audit"
+      },
+      "D4": {
+        "status": "fired",
+        "reason": "No valid sitemap document was retrieved. Checked: http://www.who.int/sitemaps/sitemapindex.xml (source=robots.txt, status=406, valid=False); https://who.int/sitemap.xml (source=default /sitemap.xml, status=None, valid=False)",
+        "skill": "crawl-render-audit"
+      },
+      "D5": {
+        "status": "clear",
+        "reason": "1 page(s) scored; none flagged as a JS-shell",
+        "skill": "crawl-render-audit"
+      },
+      "D6": {
+        "status": "skipped",
+        "reason": "no internal URLs were sampled",
+        "skill": "crawl-render-audit"
+      },
+      "D7": {
+        "status": "clear",
+        "reason": "homepage and sampled key pages have at least one JSON-LD block",
+        "skill": "structured-data-audit"
+      },
+      "D8": {
+        "status": "fired",
+        "reason": "generic-only types site-wide: ['WebSite', 'Organization', 'WebPage'] (generic=['WebSite', 'Organization', 'WebPage']; domain-specific=[])",
+        "skill": "structured-data-audit"
+      },
+      "D9": {
+        "status": "clear",
+        "reason": "6 distinct search domains; footprint threshold met",
+        "skill": "freshness-corroboration"
+      },
+      "D10": {
+        "status": "clear",
+        "reason": "official host who.int present in the search-domain list",
+        "skill": "freshness-corroboration"
+      },
+      "D11": {
+        "status": "clear",
+        "reason": "source buckets represented: ['official', 'reference', 'social', 'other']",
+        "skill": "freshness-corroboration"
+      },
+      "D12": {
+        "status": "no_signal",
+        "reason": "no checkable on-site facts (founding year / headquarters) extracted",
+        "skill": "freshness-corroboration"
+      },
+      "D13": {
+        "status": "clear",
+        "reason": "copyright year 2026 is within two years of 2026",
+        "skill": "freshness-corroboration"
+      },
+      "D14": {
+        "status": "clear",
+        "reason": "site and search summaries share content tokens ['agency', 'director', 'general', 'health', 'nations', 'organization', 'promote', 'serve']",
+        "skill": "entity-clarity-audit"
+      },
+      "D15": {
+        "status": "clear",
+        "reason": "fetch reached the origin; domain-vs-business divergence not indicated",
+        "skill": "entity-clarity-audit"
+      },
+      "E1": {
+        "status": "clear",
+        "reason": "concrete offering signal(s): ['Health', 'Organization', 'United', 'Nations']",
+        "skill": "engagement-audit"
+      },
+      "E2": {
+        "status": "clear",
+        "reason": "meta description names a concrete offering",
+        "skill": "engagement-audit"
+      },
+      "E3": {
+        "status": "clear",
+        "reason": "exactly one H1: 'World Suicide Prevention Day'",
+        "skill": "engagement-audit"
+      }
+    },
+    "skipped_checks": [
+      "D6"
+    ],
+    "skills": {
+      "crawl-render-audit": {
+        "d5": "homepage_only",
+        "skipped_checks": [
+          "D6"
+        ],
+        "check_notes": {
+          "D3": {
+            "status": "clear",
+            "reason": "homepage was reachable"
+          },
+          "FQ": {
+            "status": "clear",
+            "reason": "homepage fetch classified as usable content"
+          },
+          "D1": {
+            "status": "clear",
+            "reason": "User-agent: * does not Disallow: /"
+          },
+          "D2": {
+            "status": "fired",
+            "reason": "Named AI user-agents root-disallowed in https://who.int/robots.txt. live-agent=[]; training-crawler=['CCBot']."
+          },
+          "D4": {
+            "status": "fired",
+            "reason": "No valid sitemap document was retrieved. Checked: http://www.who.int/sitemaps/sitemapindex.xml (source=robots.txt, status=406, valid=False); https://who.int/sitemap.xml (source=default /sitemap.xml, status=None, valid=False)"
+          },
+          "D5": {
+            "status": "clear",
+            "reason": "1 page(s) scored; none flagged as a JS-shell"
+          },
+          "D6": {
+            "status": "skipped",
+            "reason": "no internal URLs were sampled"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.who.int/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 646,
+          "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+        },
+        "preferred_locale": "",
+        "sampled_internal_urls": [],
+        "page_scores": [
+          {
+            "word_count": 646,
+            "visible_text_chars": 4384,
+            "raw_html_chars": 136449,
+            "text_to_html_ratio": 0.0321,
+            "flagged": false,
+            "reason": "not_a_shell",
+            "thresholds": {
+              "absolute_word_count": 20,
+              "ratio_word_cap": 200,
+              "ratio_threshold": 0.04
+            },
+            "url": "https://www.who.int/",
+            "status": 200,
+            "path_class": "key"
+          }
+        ],
+        "robots_parse": {
+          "wildcard_root_disallow": false,
+          "sitemaps_declared": [
+            "http://www.who.int/sitemaps/sitemapindex.xml"
+          ],
+          "d2": {
+            "blocked_training_crawlers": [
+              {
+                "user_agent": "CCBot",
+                "quoted_rule": "Disallow: /",
+                "matched_via": "named"
+              }
+            ],
+            "blocked_live_agents": []
+          }
+        }
+      },
+      "structured-data-audit": {
+        "pages": "homepage_only",
+        "skipped_checks": [],
+        "check_notes": {
+          "D7": {
+            "status": "clear",
+            "reason": "homepage and sampled key pages have at least one JSON-LD block"
+          },
+          "D8": {
+            "status": "fired",
+            "reason": "generic-only types site-wide: ['WebSite', 'Organization', 'WebPage'] (generic=['WebSite', 'Organization', 'WebPage']; domain-specific=[])"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.who.int/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 646,
+          "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+        }
+      },
+      "freshness-corroboration": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D9": {
+            "status": "clear",
+            "reason": "6 distinct search domains; footprint threshold met"
+          },
+          "D10": {
+            "status": "clear",
+            "reason": "official host who.int present in the search-domain list"
+          },
+          "D11": {
+            "status": "clear",
+            "reason": "source buckets represented: ['official', 'reference', 'social', 'other']"
+          },
+          "D12": {
+            "status": "no_signal",
+            "reason": "no checkable on-site facts (founding year / headquarters) extracted"
+          },
+          "D13": {
+            "status": "clear",
+            "reason": "copyright year 2026 is within two years of 2026"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.who.int/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 646,
+          "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+        }
+      },
+      "entity-clarity-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "D14": {
+            "status": "clear",
+            "reason": "site and search summaries share content tokens ['agency', 'director', 'general', 'health', 'nations', 'organization', 'promote', 'serve']"
+          },
+          "D15": {
+            "status": "clear",
+            "reason": "fetch reached the origin; domain-vs-business divergence not indicated"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.who.int/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 646,
+          "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+        }
+      },
+      "engagement-audit": {
+        "skipped_checks": [],
+        "check_notes": {
+          "E1": {
+            "status": "clear",
+            "reason": "concrete offering signal(s): ['Health', 'Organization', 'United', 'Nations']"
+          },
+          "E2": {
+            "status": "clear",
+            "reason": "meta description names a concrete offering"
+          },
+          "E3": {
+            "status": "clear",
+            "reason": "exactly one H1: 'World Suicide Prevention Day'"
+          }
+        },
+        "homepage_fetch_quality": {
+          "url": "https://www.who.int/",
+          "status": 200,
+          "usable": true,
+          "class": "usable",
+          "reason": "usable content",
+          "word_count": 646,
+          "preview": "World Health Organization (WHO) Skip to main content World Health Organization Global Regions World Health Organization WHO Regional websites When autocomplete "
+        }
+      }
+    },
+    "brand_used": "WHO"
+  }
+}

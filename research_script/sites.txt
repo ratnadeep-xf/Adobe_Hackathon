@@ -1,0 +1,39 @@
+# Phase 1 research sites — one URL per line, '#' = comment, blank lines ignored.
+# Mix of categories on purpose: e-commerce, SaaS, local business, blog/publisher, B2B.
+# Includes a spread of well-resourced brands and smaller/local ones, since the
+# pattern you're after is "what makes AI-visibility differ," not a list itself.
+# Feel free to swap any of these out — nothing here is used for grading.
+
+# --- E-commerce ---
+https://www.allbirds.com
+https://www.chewy.com
+https://www.glossier.com
+https://www.rei.com
+
+# --- SaaS ---
+https://www.notion.com
+https://www.stripe.com
+https://www.mailchimp.com
+https://www.airtable.com
+https://www.linear.app
+
+# --- Local business (mix of cities/verticals on purpose) ---
+https://www.theplumberaustintx.com
+https://www.abacusplumbing.com
+https://www.zamscapes.com
+https://www.brooklynroasting.com
+
+# --- Blog / publisher ---
+https://www.theverge.com
+https://www.seriouseats.com
+https://stratechery.com
+
+# --- B2B ---
+https://www.gong.io
+https://www.zendesk.com
+https://www.figma.com
+https://www.hubspot.com
+
+# --- Wildcard: a couple of smaller/less-optimized sites to widen the spread ---
+https://www.moderncoffeeco.com
+https://www.thehungrymouse.com
