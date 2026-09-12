@@ -29,7 +29,9 @@ Each skill can run alone. In a full audit they reuse shared fetches instead of c
 
 ---
 
-## How the entrypoint composes them
+## How the entrypoint composes them   
+
+
 
 **audit-orchestrator** is the only `entrypoint` in `marketplace.json`. It does not re-implement the checks.
 
