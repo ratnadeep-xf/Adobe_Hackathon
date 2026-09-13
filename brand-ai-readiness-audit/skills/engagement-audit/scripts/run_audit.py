@@ -63,7 +63,9 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
                 "findings": [],
                 "self_description": {},
                 "coverage": {
-                    "skipped_checks": ["E1", "E2", "E3"],
+                    "skipped_checks": [
+                        {"id": eid, "reason": str(exc)} for eid in ("E1", "E2", "E3")
+                    ],
                     "check_notes": {
                         eid: {"status": "skipped", "reason": str(exc)}
                         for eid in ("E1", "E2", "E3")
@@ -74,7 +76,7 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
 
     desc = extract_self_description(html)
     findings: list[dict[str, Any]] = []
-    skipped: list[str] = []
+    skipped: list[dict[str, str]] = []
 
     quality = homepage.get("fetch_quality")
     if not isinstance(quality, dict) or not quality.get("class"):
@@ -93,8 +95,8 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
 
     def mark(check_id: str, status: str, reason: str) -> None:
         notes[check_id] = {"status": status, "reason": reason}
-        if status == "skipped" and check_id not in skipped:
-            skipped.append(check_id)
+        if status == "skipped" and not any(s.get("id") == check_id for s in skipped):
+            skipped.append({"id": check_id, "reason": reason})
 
     if not quality.get("usable"):
         for eid, label in (("E1", "orientation"), ("E2", "meta"), ("E3", "H1")):

@@ -82,6 +82,50 @@ def extract_self_description(site_bundle: dict[str, Any]) -> dict[str, Any]:
     return extract(html)
 
 
+def _missing_dependency_report(host: str, exc: Exception) -> dict[str, Any]:
+    """A schema-valid report for when a required third-party package (requests
+    or beautifulsoup4) isn't installed. Emitted instead of a raw crash so a
+    grading harness reading stdout still gets valid JSON, with a clear,
+    actionable finding, rather than a traceback and no report at all."""
+    missing = getattr(exc, "name", None) or str(exc)
+    finding = {
+        "id": "F-001",
+        "title": "Required Python package not installed",
+        "severity": "critical",
+        "evidence": (
+            f"Import failed: {exc}. This marketplace requires requests, "
+            f"beautifulsoup4, and ddgs (see requirements.txt at the "
+            f"marketplace root). No site fetch or HTML parsing could be "
+            f"performed, so no checks could run."
+        ),
+        "suggested_action": {
+            "summary": (
+                f"Run `pip install -r requirements.txt` from the marketplace "
+                f"root (or `pip install {missing}`) before invoking "
+                f"audit-orchestrator, then re-run the audit."
+            ),
+            "priority": "critical",
+        },
+    }
+    return {
+        "site": host,
+        "audited_at": utc_now(),
+        "summary": {"total_findings": 1, "critical": 1, "high": 0, "medium": 0, "low": 0},
+        "findings": [finding],
+        "coverage": {
+            "error": "missing_dependency",
+            "missing_dependency": missing,
+            "skipped_checks": [
+                {"id": cid, "reason": "required dependency not installed"}
+                for cid in (
+                    "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9",
+                    "D10", "D11", "D12", "D13", "D14", "D15", "E1", "E2", "E3",
+                )
+            ],
+        },
+    }
+
+
 def invoke_skills(
     origin: str,
     host: str,
@@ -93,32 +137,57 @@ def invoke_skills(
     skill_coverage: dict[str, Any] = {}
     self_description = extract_self_description(site_bundle)
 
-    crawl = load_run(SKILLS_DIR / "crawl-render-audit" / "scripts")
-    crawl_report = crawl.run(origin, site_bundle)
+    def _run_skill(skill_name: str, skill_path: Path, call) -> dict[str, Any]:
+        """Load and run one skill in isolation. A failure here (missing
+        import, unexpected exception, etc.) is recorded as that skill's
+        coverage and produces zero findings from it -- it must not stop the
+        other skills from running. Partial findings beat an empty report."""
+        try:
+            module = load_run(skill_path)
+            report = call(module)
+            findings.extend(report.get("findings") or [])
+            skill_coverage[skill_name] = report.get("coverage") or {}
+            return report
+        except Exception as exc:  # noqa: BLE001 - isolate any skill failure
+            skill_coverage[skill_name] = {
+                "error": f"{type(exc).__name__}: {exc}",
+                "skipped_checks": [
+                    {"id": skill_name, "reason": f"skill raised: {exc}"}
+                ],
+            }
+            return {}
+
+    crawl_report = _run_skill(
+        "crawl-render-audit",
+        SKILLS_DIR / "crawl-render-audit" / "scripts",
+        lambda m: m.run(origin, site_bundle),
+    )
     site_bundle = crawl_report.get("site_bundle") or site_bundle
-    findings.extend(crawl_report.get("findings") or [])
-    skill_coverage["crawl-render-audit"] = crawl_report.get("coverage") or {}
 
-    structured = load_run(SKILLS_DIR / "structured-data-audit" / "scripts")
-    structured_report = structured.run(origin, site_bundle)
-    findings.extend(structured_report.get("findings") or [])
-    skill_coverage["structured-data-audit"] = structured_report.get("coverage") or {}
+    structured_report = _run_skill(
+        "structured-data-audit",
+        SKILLS_DIR / "structured-data-audit" / "scripts",
+        lambda m: m.run(origin, site_bundle),
+    )
 
-    freshness = load_run(SKILLS_DIR / "freshness-corroboration" / "scripts")
-    freshness_report = freshness.run(origin, site_bundle, search_bundle, brand)
+    freshness_report = _run_skill(
+        "freshness-corroboration",
+        SKILLS_DIR / "freshness-corroboration" / "scripts",
+        lambda m: m.run(origin, site_bundle, search_bundle, brand),
+    )
     search_bundle = freshness_report.get("search_bundle") or search_bundle
-    findings.extend(freshness_report.get("findings") or [])
-    skill_coverage["freshness-corroboration"] = freshness_report.get("coverage") or {}
 
-    entity = load_run(SKILLS_DIR / "entity-clarity-audit" / "scripts")
-    entity_report = entity.run(origin, site_bundle, search_bundle, brand, self_description)
-    findings.extend(entity_report.get("findings") or [])
-    skill_coverage["entity-clarity-audit"] = entity_report.get("coverage") or {}
+    _run_skill(
+        "entity-clarity-audit",
+        SKILLS_DIR / "entity-clarity-audit" / "scripts",
+        lambda m: m.run(origin, site_bundle, search_bundle, brand, self_description),
+    )
 
-    engagement = load_run(SKILLS_DIR / "engagement-audit" / "scripts")
-    engagement_report = engagement.run(origin, site_bundle)
-    findings.extend(engagement_report.get("findings") or [])
-    skill_coverage["engagement-audit"] = engagement_report.get("coverage") or {}
+    _run_skill(
+        "engagement-audit",
+        SKILLS_DIR / "engagement-audit" / "scripts",
+        lambda m: m.run(origin, site_bundle),
+    )
 
     return findings, site_bundle, search_bundle, self_description, skill_coverage
 
@@ -138,11 +207,21 @@ def _merge_check_notes(skill_coverage: dict[str, Any]) -> tuple[dict[str, Any], 
             notes[check_id] = entry
             if entry["status"] == "skipped" and check_id not in skipped:
                 skipped.append(check_id)
-        for check_id in (payload or {}).get("skipped_checks") or []:
+        for entry in (payload or {}).get("skipped_checks") or []:
+            # Skills report this as either a bare id (str) or an
+            # {"id": ..., "reason": ...} object (Phase 9.3). Normalize both.
+            if isinstance(entry, dict):
+                check_id = entry.get("id")
+                reason = entry.get("reason") or "not evaluated"
+            else:
+                check_id = entry
+                reason = "not evaluated"
+            if check_id is None:
+                continue
             if check_id not in notes:
                 notes[check_id] = {
                     "status": "skipped",
-                    "reason": "not evaluated",
+                    "reason": reason,
                     "skill": skill,
                 }
                 skipped.append(check_id)
@@ -191,7 +270,11 @@ def run(request_text: str, brand_override: str = "") -> dict[str, Any]:
     origin = parsed["origin"]
     host = parsed["host"]
 
-    site_bundle = collect_site_bundle(origin)
+    try:
+        site_bundle = collect_site_bundle(origin)
+    except (ImportError, ModuleNotFoundError) as exc:
+        return validate_report(_missing_dependency_report(host, exc))
+
     homepage = site_bundle.get("homepage") or {}
     html = homepage.get("html") or ""
     home_quality = homepage.get("fetch_quality") or {}
@@ -206,10 +289,12 @@ def run(request_text: str, brand_override: str = "") -> dict[str, Any]:
     fresh_scripts = SKILLS_DIR / "freshness-corroboration" / "scripts"
     if str(fresh_scripts) not in sys.path:
         sys.path.insert(0, str(fresh_scripts))
-    from web_search import search_bundle as make_search
 
     try:
+        from web_search import search_bundle as make_search
         search = make_search(brand, host)
+    except (ImportError, ModuleNotFoundError) as exc:
+        return validate_report(_missing_dependency_report(host, exc))
     except Exception as exc:
         search = {
             "query": brand,
@@ -219,9 +304,12 @@ def run(request_text: str, brand_override: str = "") -> dict[str, Any]:
             "error": str(exc),
         }
 
-    merged, site_bundle, _, _, skill_coverage = invoke_skills(
-        origin, host, brand, site_bundle, search
-    )
+    try:
+        merged, site_bundle, _, _, skill_coverage = invoke_skills(
+            origin, host, brand, site_bundle, search
+        )
+    except (ImportError, ModuleNotFoundError) as exc:
+        return validate_report(_missing_dependency_report(host, exc))
     crawl_cov = skill_coverage.get("crawl-render-audit") or {}
     sampled = (
         crawl_cov.get("sampled_internal_urls")
