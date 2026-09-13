@@ -23,9 +23,10 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from fetch_quality import classify_page  # noqa: E402
+from fetch_quality import D3_SPECS, classify_page, d3_subcategory  # noqa: E402
 from http_client import chain_has_auth_block, fetch  # noqa: E402
 from js_shell import score_html  # noqa: E402
+from page_echo import ECHO_FLAG, mark_homepage_echoes  # noqa: E402
 from robots_parser import d2_blocked, is_path_allowed, parse_robots  # noqa: E402
 from sitemap_sampler import classify_path, collect_from_declared, locale_prefix  # noqa: E402
 
@@ -119,21 +120,6 @@ def resolve_origin(raw: str, bundle: dict[str, Any] | None) -> tuple[str, dict[s
     return https_origin, homepage
 
 
-def is_d3(page: dict[str, Any]) -> bool:
-    if page.get("status") in {401, 403}:
-        return True
-    if page.get("status") is None and page.get("blocked"):
-        return True
-    if page.get("error") in {
-        "timeout",
-        "connection reset",
-        "connection refused",
-        "connection error",
-    }:
-        return True
-    return False
-
-
 def page_path(url: str) -> str:
     path = urlparse(url).path or "/"
     return path if path.startswith("/") else "/" + path
@@ -149,13 +135,13 @@ def score_page(url: str, origin: str, html: str, status: int | None) -> dict[str
 
 def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     findings: list[dict[str, Any]] = []
-    skipped: list[str] = []
+    skipped: list[dict[str, str]] = []
     notes: dict[str, dict[str, str]] = {}
 
     def mark(check_id: str, status: str, reason: str) -> None:
         notes[check_id] = {"status": status, "reason": reason}
-        if status == "skipped" and check_id not in skipped:
-            skipped.append(check_id)
+        if status == "skipped" and not any(row.get("id") == check_id for row in skipped):
+            skipped.append({"id": check_id, "reason": reason})
 
     if bundle and bundle.get("homepage"):
         origin = (bundle.get("origin") or origin_from_url(bundle["homepage"].get("url") or target)).rstrip("/")
@@ -178,30 +164,34 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     home_quality = homepage.get("fetch_quality") or classify_page(homepage)
     homepage["fetch_quality"] = home_quality
 
-    d3_hit = is_d3(homepage) or home_quality.get("class") == "hard_block"
+    d3_kind = d3_subcategory(homepage, home_quality)
+    d3_hit = d3_kind is not None
     if d3_hit:
         status = homepage.get("status")
         err = homepage.get("error")
         header_bits = homepage.get("headers") or {}
+        spec = D3_SPECS[d3_kind]
         evidence = (
-            f"Homepage {homepage.get('url') or origin + '/'} returned "
-            f"status={status if status is not None else 'null'}"
+            f"D3 sub-category={d3_kind}. Homepage {homepage.get('url') or origin + '/'} "
+            f"returned status={status if status is not None else 'null'}"
         )
         if err:
             evidence += f", error={err}"
+        if homepage.get("retried_429"):
+            evidence += ", retried once after Retry-After/backoff"
         if header_bits:
             evidence += f", headers={header_bits}"
         evidence += ". This is an infrastructure-level block, recorded before robots.txt checks."
         findings.append(
             finding(
                 "D3",
-                "Infrastructure-level hard block on the homepage",
-                "critical",
+                spec["title"],
+                spec["severity"],
                 evidence,
-                "Review WAF/CDN/bot rules so ordinary HTTP clients and crawlers can reach public pages.",
+                spec["action"],
             )
         )
-        mark("D3", "fired", evidence[:160])
+        mark("D3", "fired", f"{d3_kind}: {evidence[:140]}")
     elif not home_quality.get("usable"):
         findings.append(
             finding(
@@ -409,6 +399,8 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
                 "error": raw.get("error"),
                 "history_statuses": raw.get("history_statuses") or [],
             }
+            if raw.get(ECHO_FLAG):
+                page[ECHO_FLAG] = True
             sampled_pages.append(page)
     elif allow_further_fetches:
         sampled_urls = list(sitemap_result.get("sampled_internal_urls") or [])
@@ -430,6 +422,9 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
             )
     else:
         sampled_urls = []
+
+    homepage_html = homepage.get("html") or homepage.get("text") or ""
+    echo_samples = mark_homepage_echoes(homepage_html, sampled_pages)
 
     page_scores: list[dict[str, Any]] = []
     homepage_scorable = bool(home_quality.get("usable")) and homepage.get("status") in {200, 203}
@@ -457,6 +452,8 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
                     "final_url": page.get("final_url"),
                 }
             )
+            continue
+        if page.get(ECHO_FLAG):
             continue
         html = page.get("html") or ""
         page_quality = classify_page(page)
@@ -488,6 +485,12 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
         mark("D5", "skipped", "no HTML page could be scored")
     else:
         mark("D5", "clear", f"{len(page_scores)} page(s) scored; none flagged as a JS-shell")
+    if echo_samples:
+        extra = f"excluded {len(echo_samples)} homepage-echo sample(s) from D5 scoring"
+        if "D5" in notes:
+            notes["D5"]["reason"] = (notes["D5"].get("reason") or "") + f"; {extra}"
+        else:
+            mark("D5", "clear", extra)
 
     if gated:
         bits = ", ".join(f"{g['url']} status={g['status']}" for g in gated)
@@ -545,6 +548,7 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
                 "headers": homepage.get("headers") or {},
                 "html": homepage.get("html") or homepage.get("text"),
                 "error": homepage.get("error"),
+                "retried_429": bool(homepage.get("retried_429")),
                 "fetch_quality": home_quality,
             },
             "robots_txt": {
@@ -565,6 +569,7 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
                     "html": p.get("html"),
                     "error": p.get("error"),
                     "history_statuses": p.get("history_statuses") or [],
+                    **({ECHO_FLAG: True} if p.get(ECHO_FLAG) else {}),
                 }
                 for p in sampled_pages
             ],
@@ -574,6 +579,8 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
             "skipped_checks": skipped,
             "check_notes": notes,
             "homepage_fetch_quality": home_quality,
+            "d3_subcategory": d3_kind,
+            "homepage_echo_samples": echo_samples,
             "preferred_locale": locale_prefix(homepage.get("final_url") or homepage.get("url") or ""),
             "sampled_internal_urls": [p.get("url") for p in sampled_pages if p.get("url")],
             "page_scores": page_scores,

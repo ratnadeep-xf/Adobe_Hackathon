@@ -24,10 +24,13 @@ robots.txt. Never guess internal paths.
 5. Immediately after the homepage fetch, classify the response with
    `scripts/fetch_quality.py` as `usable`, `interstitial`, `error`, or
    `hard_block`. Downstream content/identity checks must read this
-   classification first. D3 covers `hard_block` (403 / connection). A
-   404 stub or JS-challenge is **not** D3 — emit a single `FQ` finding
-   at `medium` (uncertainty, not a claim about the brand) and do not
-   score that body as the homepage.
+   classification first. D3 covers infrastructure blocks (403 / 401 /
+   429-after-retry / 405 / timeout / empty 2xx). A 404 stub or
+   JS-challenge is **not** D3 — emit a single `FQ` finding at `medium`
+   (uncertainty, not a claim about the brand) and do not score that body
+   as the homepage. Empty 202 / empty successful bodies are classified
+   as `interstitial` (`empty_202`) so identity/engagement checks skip
+   them the same way they skip JS-challenge pages.
 
 ---
 
@@ -72,6 +75,14 @@ parser's named-agent table in the bundle.
 access and live-agent access are different permissions and must be
 reported separately.
 
+**Evidence (n=100+22 crawl pass, D1–D8 only):** roughly 1 in 5 sites
+(20%) block any named AI crawler. The lead reason these stay two
+categories — not one “AI bots” bucket — is GPTBot vs ChatGPT-User:
+about 14% of sites diverge on those two agents. Sites tolerate
+live-citation traffic more than training-scraping; ChatGPT-User and
+Claude-Web are blocked far less often than GPTBot, CCBot, and
+Bytespider.
+
 **Classification** (canonical names; match case-insensitively):
 
 | Category | User-agents |
@@ -110,36 +121,53 @@ access. If both, mention both.
 
 ---
 
-## D3 — Infrastructure-level hard block (WAF / 403)
+## D3 — Infrastructure-level hard block (split sub-categories)
 
 **Detects:** the homepage is unreachable to an automated visitor *before*
 robots.txt is a useful signal. Harder than a robots disallow: there is
-nothing to parse.
+nothing to parse. Do not dump every failure into one “hard block”
+bucket — remediation differs.
+
+**Sub-categories** (same check id `D3`; distinct title and suggested
+action). Default severity is `critical` except `rate_limited_429`.
+
+| Sub-category | When | Severity |
+|---|---|---|
+| `waf_403` | HTTP 403 — likely bot-detection WAF | critical |
+| `rate_limited_429` | HTTP 429 **after one retry** (see below) | high |
+| `auth_401_homepage` | HTTP 401 on the homepage — the whole site is gated | critical |
+| `empty_202` | HTTP 202, or a successful status with an empty/non-content body | critical |
+| `method_not_allowed_405` | HTTP 405 on GET `/` | critical |
+| `no_response_timeout` | timeout, connection reset/refused, or no response | critical |
+
+`auth_401_homepage` is not D6. D6 stays scoped to **internal** URLs.
+
+**429 retry:** before classifying `rate_limited_429`, retry the homepage
+GET once after a short delay. Honor `Retry-After` when present (cap the
+wait); otherwise wait a few seconds. If the retry succeeds, continue as
+a normal fetch — do not report D3. Report `rate_limited_429` only if
+the retry also fails. Do not assert a 429 at the same confidence as a
+confirmed 403.
 
 **Steps**
 
 1. Fetch `{origin}/` **before** fetching robots.txt.
-2. D3 fires when any of these is true:
-   - HTTP status is `403`
-   - the TCP/TLS connection is reset, refused, or times out
-   - the client is blocked with no usable HTML body (e.g. empty 403 from a WAF)
-3. Status `401` on the homepage is D3 as well (the whole site is gated).
-4. Status `200`–`399` (after redirects) is not D3. Follow same-host
-   redirects; record `final_url`.
-5. A 404 homepage is not D3 (the server answered).
-6. Do **not** classify a later internal 403 as D3 — that is D6.
-7. If D3 fires, you may still GET `/robots.txt` once for the bundle. Do
+2. Classify with `scripts/fetch_quality.py`. Map the response to a
+   sub-category via `d3_subcategory`.
+3. A 404 homepage is not D3 (the server answered). JS-challenge pages
+   with challenge copy are `FQ` interstitial, not `empty_202`.
+4. Do **not** classify a later internal 403 as D3 — that is D6.
+5. If D3 fires, you may still GET `/robots.txt` once for the bundle. Do
    not sample internal pages.
 
-**Evidence:** HTTP status (or `null` on connection failure), a short
-error string if the request never completed, and a small header subset
-when present (`server`, `cf-ray`, `x-*`, `www-authenticate`,
-`content-type`).
+**Evidence:** sub-category id, HTTP status (or `null` on connection
+failure), whether a 429 was retried, a short error string if the
+request never completed, and a small header subset when present
+(`server`, `cf-ray`, `retry-after`, `www-authenticate`, `content-type`).
 
-**Severity:** `critical`.
-
-**Suggested action:** review WAF/CDN/bot rules so ordinary HTTP clients
-and reputable crawlers can reach public pages. This skill only recommends.
+**Suggested action:** use the sub-category-specific text (WAF vs rate
+limit vs timeout vs empty 202 vs 405 vs whole-site 401). This skill
+only recommends.
 
 ---
 
@@ -223,6 +251,12 @@ server-rendered, so homepage-only scanning is not enough.
 5. **Never invent a URL.** If the sitemap is missing or empty, do not
    guess `/about` or `/pricing`. Coverage becomes `homepage_only` (or
    `none` if the homepage was not fetched).
+6. **Homepage-echo / suspected soft-404:** for each sampled internal
+   URL, compare its `<title>` and visible word count to the homepage.
+   If they are effectively identical, mark the sample
+   `identical_to_homepage_suspected_soft_404` and **exclude it from D5
+   (and D7/D8) scoring**. List those URLs in `coverage.homepage_echo_samples`.
+   Do not treat a homepage echo as a thin internal page.
 
 **Per-page metric** (`scripts/js_shell.py`):
 
@@ -301,7 +335,7 @@ a public, unauthenticated representation. Do not attempt to log in.
 
 | ID | Severity |
 |---|---|
-| D3 | critical (hard block only) |
+| D3 | critical by default; `rate_limited_429` is high |
 | FQ | medium (404 stub / JS-challenge / unusable body — uncertainty) |
 | D1 | critical |
 | D2 | high if any live-agent blocked; medium if only training-crawlers |

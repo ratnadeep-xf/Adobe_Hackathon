@@ -18,10 +18,12 @@ pages). Never guess internal paths.
    - Homepage HTML (required).
    - Sampled internal pages from the site bundle, **or** real `<loc>` URLs
      from a declared/default sitemap. Never invent `/about` or `/product`.
-3. Skip pages whose fetch is 401/403, non-HTML, or classified as
-   interstitial/error. They are not "missing JSON-LD"; they were not
-   readable. If the homepage itself is not usable content, skip D7 and
-   D8 entirely.
+3. Skip pages whose fetch is 401/403, non-HTML, classified as
+   interstitial/error, or flagged
+   `identical_to_homepage_suspected_soft_404` (homepage echo / suspected
+   soft-404). They are not "missing JSON-LD"; they were not a distinct
+   readable page. If the homepage itself is not usable content, skip D7
+   and D8 entirely.
 4. Strip a leading locale segment before key-vs-marginal and
    path-to-type mapping (`/en-us/pricing` is a pricing page).
 5. Identify fetches as read-only. Prefer `scripts/jsonld.py` over
@@ -41,6 +43,10 @@ pages). Never guess internal paths.
 
 **Detects:** no `application/ld+json` blocks. A page can be well-written
 and still give a machine nothing structured to extract.
+
+**Evidence (n=100+22 reachable sites):** JSON-LD presence is roughly a
+coin flip — about 56% present / 44% absent. Do not frame absence as
+rare, and do not frame presence as the norm.
 
 **Steps**
 
@@ -84,6 +90,11 @@ or on-page language — do not offer a fixed commercial list
 *specific* fact — only generic chrome types, or types that do not match
 the page's evident purpose. This is a disambiguation problem, not a
 total absence (that is D7).
+
+**Evidence (n=100+22):** this is the strongest single finding behind this
+skill. Among sites that **do** have JSON-LD, 67% still use only generic
+Organization/WebSite types with nothing domain-specific. Lead with that
+rate; it is not a footnote to D7.
 
 **Generic types** (chrome / identity-wrapper; match case-insensitively,
 ignore `https://schema.org/` prefixes):

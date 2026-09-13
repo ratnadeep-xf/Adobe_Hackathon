@@ -79,3 +79,4 @@ Findings use ids `D14`–`D15`. Extra fields: `site_description`,
 - Do not re-search when a bundle is provided.
 - Recommend-only. No writes, no login.
 - Conservative D14: prefer a miss over a false critical.
+- D9–D15 can vary run-to-run: they depend on live keyless search hits, not only fetched page content.

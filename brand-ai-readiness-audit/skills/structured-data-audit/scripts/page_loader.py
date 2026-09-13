@@ -131,6 +131,8 @@ def pages_from_bundle(bundle: dict[str, Any]) -> list[dict[str, Any]]:
         url = raw.get("final_url") or raw.get("url") or ""
         if is_homepage_url(url):
             continue
+        if raw.get("identical_to_homepage_suspected_soft_404"):
+            continue
         pages.append({"url": url, "html": html, "status": status or 200, "role": "internal"})
     return pages
 

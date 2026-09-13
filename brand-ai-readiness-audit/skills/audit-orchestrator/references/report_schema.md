@@ -41,7 +41,13 @@ be told apart from an under-sampled or interstitial fetch.
 
 Typical keys: `homepage_fetch_quality`, `preferred_locale`,
 `sampled_internal_urls`, `sampled_page_count`, `path_classes`,
-`check_notes`, `skipped_checks`, `skills`, `brand_used`.
+`homepage_echo_samples`, `d3_subcategory`, `check_notes`,
+`skipped_checks`, `skills`, `brand_used`.
+
+`homepage_echo_samples` lists sampled internal URLs whose title and
+word count matched the homepage (`identical_to_homepage_suspected_soft_404`).
+Those URLs are excluded from D5/D7/D8 scoring. An empty list means none
+were detected — the same visibility pattern as `skipped_checks`.
 
 `skipped_checks` lists only checks that **could not run** (unusable
 fetch, no search results, no sample). Checks that ran and did not fire

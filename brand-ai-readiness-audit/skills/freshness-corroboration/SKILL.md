@@ -72,7 +72,8 @@ Full rules: [references/checks.md](references/checks.md).
    `low` if merely unconfirmed.
 7. **D13 — copyright / Last-Modified.** Regex for `©`/`copyright` + year;
    read `Last-Modified` if present. **Severity is hard-capped at `low` in
-   the script — never raise it.** Absence of a year does not fire (noisy).
+   the script — never raise it.** Absence of a year does not fire (noisy:
+   41% of n=100+22 sites had no year, confirming the Phase 2 Low cap).
    A year two or more years behind the current calendar year may fire, still
    `low` only.
 8. **Emit** findings plus the search bundle for reuse by entity-clarity-audit.
@@ -91,3 +92,4 @@ buckets). A later orchestrator may rewrite ids to `F-00N`.
 - **D13 can never be anything but `low`.** That cap is in the procedure and
   in `scripts/run_audit.py`, not a footnote.
 - Patterns and counts only — no hardcoded brands.
+- D9–D15 can vary run-to-run: they depend on live keyless search hits, not only fetched page content.

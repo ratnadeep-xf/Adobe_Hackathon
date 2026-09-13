@@ -26,11 +26,6 @@ FILLER = {
     "https", "http", "www", "com", "the", "and", "for", "with", "from",
 }
 
-PARKED_RE = re.compile(
-    r"domain is for sale|buy this domain|parked free|this domain is parked",
-    re.I,
-)
-
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -140,7 +135,20 @@ def run(
     host = host_of(origin)
     homepage = (bundle or {}).get("homepage") or {}
     html = homepage.get("html") or homepage.get("text") or ""
-    desc = self_description or extract_self_description(html)
+    quality = _fetch_quality(homepage)
+    if self_description is not None:
+        desc = self_description
+    elif not quality.get("usable"):
+        desc = {
+            "title": "",
+            "meta_description": "",
+            "h1s": [],
+            "first_paragraph": "",
+            "combined": "",
+            "concrete_offerings": [],
+        }
+    else:
+        desc = extract_self_description(html)
 
     if search is None:
         fresh_scripts = SKILLS_DIR / "freshness-corroboration" / "scripts"
@@ -152,13 +160,13 @@ def run(
     summary = search_summary(search)
     site_text = desc.get("combined") or ""
     findings: list[dict[str, Any]] = []
-    skipped: list[str] = []
+    skipped: list[dict[str, str]] = []
     notes: dict[str, dict[str, str]] = {}
 
     def mark(check_id: str, status: str, reason: str) -> None:
         notes[check_id] = {"status": status, "reason": reason}
-        if status == "skipped" and check_id not in skipped:
-            skipped.append(check_id)
+        if status == "skipped" and not any(row.get("id") == check_id for row in skipped):
+            skipped.append({"id": check_id, "reason": reason})
 
     quality = _fetch_quality(homepage)
     if not quality.get("usable"):

@@ -23,11 +23,14 @@ Detailed check-by-check rules: [references/checks.md](references/checks.md).
 
 ## When to use
 
-Use when the pages are already reachable and readable, and the question is
-whether they are **marked up so a machine can extract specific facts** — not
-just prose. Typical triggers: missing JSON-LD, schema.org only as
-`Organization` / `WebSite`, or markup on the homepage but not on the pages
-that actually describe the offering.
+Use when the pages are already reachable and readable, and the question
+is whether they are **marked up so a machine can extract specific facts**
+— not just prose. The strongest signal from the n=100+22 crawl pass: of
+sites that have JSON-LD at all, **67% still use only generic
+Organization/WebSite types**. Typical triggers: missing JSON-LD
+(presence is roughly a coin flip: 56% / 44% among reachable sites), or
+markup that is only generic chrome when the page implies something more
+specific.
 
 Do not use this skill for crawl/access problems, cross-web corroboration,
 name collisions, or on-page messaging. Those are other skills.

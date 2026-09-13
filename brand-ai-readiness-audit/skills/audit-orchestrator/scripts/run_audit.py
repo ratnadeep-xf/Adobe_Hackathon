@@ -240,6 +240,8 @@ def run(request_text: str, brand_override: str = "") -> dict[str, Any]:
         "preferred_locale": crawl_cov.get("preferred_locale") or "",
         "sampled_internal_urls": sampled,
         "sampled_page_count": len(sampled),
+        "homepage_echo_samples": crawl_cov.get("homepage_echo_samples") or [],
+        "d3_subcategory": crawl_cov.get("d3_subcategory"),
         "path_classes": path_classes,
         "check_notes": check_notes,
         "skipped_checks": skipped_only,

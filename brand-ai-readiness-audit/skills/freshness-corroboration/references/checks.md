@@ -105,8 +105,10 @@ snippets with URLs.
 **Detects:** footer copyright year or `Last-Modified` suggests staleness.
 
 **HARD RULE (implemented in code, not optional):** D13 severity is
-always `low`. Never upgrade. This signal is confirmed noisy — active
-sites often have no year at all. D13 alone must never justify a
+always `low`. Never upgrade. This signal is confirmed noisy — in the
+n=100+22 crawl pass, **41%** of sites had no copyright year at all,
+which further confirms (and does not change) the original Phase 2
+decision to keep D13 at Low. D13 alone must never justify a
 high-severity finding.
 
 **Steps**

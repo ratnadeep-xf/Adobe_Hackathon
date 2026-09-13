@@ -64,11 +64,13 @@ Follow this order even if running checks by hand. Full pass/fail rules live in
 
 1. **Normalize** the input to an origin. Do not start from robots.txt.
 2. **D3 first — homepage hard block.** Fetch the homepage. Classify the
-   response with `scripts/fetch_quality.py`. If the response is 403, the
-   connection is reset/refused, or the request is otherwise blocked
-   before any useful body arrives, record D3 (critical) and do not crawl
-   internal URLs. A 404 stub or JS-challenge is **not** D3 — record `FQ`
-   (medium) and do not treat that body as the brand homepage. A single
+   response with `scripts/fetch_quality.py`. Split D3 into sub-categories
+   (`waf_403`, `rate_limited_429`, `auth_401_homepage`, `empty_202`,
+   `method_not_allowed_405`, `no_response_timeout`) with distinct titles
+   and actions. Retry a 429 once (honor `Retry-After`) before calling it
+   a block. If D3 fires, do not crawl internal URLs. A 404 stub or
+   JS-challenge is **not** D3 — record `FQ` (medium). Empty 202 / empty
+   successful bodies are `interstitial` (`empty_202`). A single
    subsequent `/robots.txt` fetch is allowed only as diagnostics.
 3. **Fetch `/robots.txt`.** Parse with `scripts/robots_parser.py` (not by
    informal reading).
@@ -94,10 +96,12 @@ Follow this order even if running checks by hand. Full pass/fail rules live in
    locale trees. Cap the sample; delay between requests; skip paths
    disallowed for `User-agent: *`.
 8. **D5 — JS-shell.** For the homepage and each sampled page, run
-   `scripts/js_shell.py`. Flag on a **low absolute visible-word count**, not
-   on a low text-to-HTML ratio alone. A long page with a low ratio is normal.
-   Severity: **high** if a key path (product / pricing / about / equivalent)
-   is affected; **low** if only marginal paths are.
+   `scripts/js_shell.py`. Skip samples flagged
+   `identical_to_homepage_suspected_soft_404`. Flag on a **low absolute
+   visible-word count**, not on a low text-to-HTML ratio alone. A long
+   page with a low ratio is normal. Severity: **high** if a key path
+   (product / pricing / about / equivalent) is affected; **low** if only
+   marginal paths are.
 9. **D6 — auth walls.** While sampling, record 401/403 (or a redirect chain
    that includes them) on internal URLs. These are not D3 (homepage-level) and
    not D5 (content hidden behind JS). Medium.

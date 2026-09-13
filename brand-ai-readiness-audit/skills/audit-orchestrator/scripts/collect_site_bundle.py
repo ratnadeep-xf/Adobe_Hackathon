@@ -17,7 +17,7 @@ def _load_crawl_modules():
     if path not in sys.path:
         sys.path.insert(0, path)
     # Isolate from other skills' identically named modules.
-    for name in ("http_client", "robots_parser", "sitemap_sampler", "fetch_quality"):
+    for name in ("http_client", "robots_parser", "sitemap_sampler", "fetch_quality", "page_echo"):
         sys.modules.pop(name, None)
     import http_client
     import robots_parser
@@ -39,9 +39,10 @@ def collect_site_bundle(origin: str) -> dict[str, Any]:
         "headers": homepage.get("headers") or {},
         "html": homepage.get("text"),
         "error": homepage.get("error"),
+        "retried_429": bool(homepage.get("retried_429")),
     }
     sys.modules.pop("fetch_quality", None)
-    from fetch_quality import classify_page
+    from fetch_quality import classify_page, d3_subcategory
 
     quality = classify_page(homepage_out)
     preferred_locale = sitemap_sampler.locale_prefix(
@@ -52,9 +53,7 @@ def collect_site_bundle(origin: str) -> dict[str, Any]:
     robots_text = robots.get("text") or ""
     parsed = robots_parser.parse_robots(robots_text) if robots.get("status") == 200 and robots_text.strip() else robots_parser.parse_robots("")
     root_block = bool(parsed.get("wildcard_root_disallow"))
-    hard_block = homepage.get("status") in {401, 403} or (
-        homepage.get("status") is None and homepage.get("blocked")
-    )
+    hard_block = d3_subcategory(homepage_out, quality) is not None
 
     sitemaps_out: list[dict[str, Any]] = []
     sampled_pages: list[dict[str, Any]] = []
@@ -95,6 +94,11 @@ def collect_site_bundle(origin: str) -> dict[str, Any]:
                     "history_statuses": result.get("history_statuses") or [],
                 }
             )
+
+    sys.modules.pop("page_echo", None)
+    from page_echo import mark_homepage_echoes
+
+    mark_homepage_echoes(homepage_out.get("html") or "", sampled_pages)
 
     return {
         "origin": origin,

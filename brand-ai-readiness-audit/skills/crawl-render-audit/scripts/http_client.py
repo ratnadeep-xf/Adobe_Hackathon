@@ -8,6 +8,8 @@ short delay keep the crawl recommend-only and non-abusive.
 from __future__ import annotations
 
 import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 from urllib.parse import urlparse
 
@@ -16,6 +18,8 @@ import requests
 USER_AGENT = "Mozilla/5.0 (compatible; BrandAIReadinessAudit/1.0; +read-only-audit)"
 TIMEOUT_SECONDS = 12
 INTER_REQUEST_DELAY_SECONDS = 0.35
+DEFAULT_429_WAIT_SECONDS = 4
+MAX_429_WAIT_SECONDS = 15
 
 _DIAGNOSTIC_HEADERS = (
     "server",
@@ -27,6 +31,7 @@ _DIAGNOSTIC_HEADERS = (
     "x-robots-tag",
     "last-modified",
     "location",
+    "retry-after",
 )
 
 
@@ -57,6 +62,38 @@ def _header_subset(headers: Any) -> dict[str, str]:
     return out
 
 
+def _retry_after_seconds(headers: Any) -> float:
+    raw = ""
+    if headers:
+        raw = headers.get("Retry-After") or headers.get("retry-after") or ""
+    raw = str(raw).strip()
+    if not raw:
+        return float(DEFAULT_429_WAIT_SECONDS)
+    try:
+        return max(0.5, min(float(raw), MAX_429_WAIT_SECONDS))
+    except ValueError:
+        pass
+    try:
+        when = parsedate_to_datetime(raw)
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        wait = (when - datetime.now(timezone.utc)).total_seconds()
+        if wait <= 0:
+            return float(DEFAULT_429_WAIT_SECONDS)
+        return min(wait, MAX_429_WAIT_SECONDS)
+    except (TypeError, ValueError, OverflowError):
+        return float(DEFAULT_429_WAIT_SECONDS)
+
+
+def _get(url: str):
+    return requests.get(
+        url,
+        headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xml,text/plain,*/*"},
+        timeout=TIMEOUT_SECONDS,
+        allow_redirects=True,
+    )
+
+
 def fetch(url: str, origin: str, delay: bool = True) -> dict[str, Any]:
     """GET a same-origin URL. Raises nothing — errors are in the result dict."""
     result: dict[str, Any] = {
@@ -68,6 +105,7 @@ def fetch(url: str, origin: str, delay: bool = True) -> dict[str, Any]:
         "error": None,
         "history_statuses": [],
         "blocked": False,
+        "retried_429": False,
     }
     if not same_origin(url, origin):
         result["error"] = "refusing off-origin fetch"
@@ -78,12 +116,11 @@ def fetch(url: str, origin: str, delay: bool = True) -> dict[str, Any]:
         time.sleep(INTER_REQUEST_DELAY_SECONDS)
 
     try:
-        response = requests.get(
-            url,
-            headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xml,text/plain,*/*"},
-            timeout=TIMEOUT_SECONDS,
-            allow_redirects=True,
-        )
+        response = _get(url)
+        if response.status_code == 429:
+            time.sleep(_retry_after_seconds(response.headers))
+            response = _get(url)
+            result["retried_429"] = True
     except requests.exceptions.Timeout:
         result["error"] = "timeout"
         result["blocked"] = True
@@ -123,7 +160,7 @@ def fetch(url: str, origin: str, delay: bool = True) -> dict[str, Any]:
     except Exception:
         result["text"] = response.content.decode("utf-8", errors="replace")
 
-    if response.status_code in {401, 403}:
+    if response.status_code in {401, 403, 429, 405}:
         result["blocked"] = True
     return result
 

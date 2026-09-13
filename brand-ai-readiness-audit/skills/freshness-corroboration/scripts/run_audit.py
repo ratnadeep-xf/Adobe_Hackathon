@@ -154,14 +154,14 @@ def run(
     search_data["buckets"] = classified
 
     findings: list[dict[str, Any]] = []
-    skipped: list[str] = []
+    skipped: list[dict[str, str]] = []
     notes: dict[str, dict[str, str]] = {}
     count = len(domains)
 
     def mark(check_id: str, status: str, reason: str) -> None:
         notes[check_id] = {"status": status, "reason": reason}
-        if status == "skipped" and check_id not in skipped:
-            skipped.append(check_id)
+        if status == "skipped" and not any(row.get("id") == check_id for row in skipped):
+            skipped.append({"id": check_id, "reason": reason})
 
     if count < 3:
         findings.append(

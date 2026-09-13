@@ -75,23 +75,14 @@ def resolve_pages(target: str, bundle: dict[str, Any] | None) -> tuple[str, list
 
 def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     origin, pages = resolve_pages(target, bundle)
-    extractions: list[dict[str, Any]] = []
-    for page in pages:
-        extracted = extract_jsonld(page["html"])
-        extracted["url"] = page["url"]
-        extracted["role"] = page["role"]
-        extracted["path_class"] = path_class(page["url"])
-        extracted["purpose_mismatch"] = purpose_mismatch(page["url"], extracted["types"])
-        extractions.append(extracted)
-
     findings: list[dict[str, Any]] = []
-    skipped: list[str] = []
+    skipped: list[dict[str, str]] = []
     notes: dict[str, dict[str, str]] = {}
 
     def mark(check_id: str, status: str, reason: str) -> None:
         notes[check_id] = {"status": status, "reason": reason}
-        if status == "skipped" and check_id not in skipped:
-            skipped.append(check_id)
+        if status == "skipped" and not any(row.get("id") == check_id for row in skipped):
+            skipped.append({"id": check_id, "reason": reason})
 
     home_page = next((p for p in pages if p.get("role") == "homepage"), None)
     home_quality = None
@@ -115,22 +106,57 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
             home_quality = {"usable": True, "class": "usable"}
 
     empty_after = bool((bundle or {}).get("sitemap_empty_after_recursion"))
-    empty_after_reason = "sitemap present but no page URLs reachable within recursion depth"
-
-    if not extractions:
-        mark("D7", "skipped", "no scorable HTML pages")
-        mark("D8", "skipped", "no scorable HTML pages")
-        return _report(origin, findings, extractions, skipped, "none", home_quality, notes)
+    empty_after_reason = (
+        "internal pages not sampled: sitemap present but no page URLs "
+        "reachable within recursion depth"
+    )
+    echo_samples = [
+        p.get("final_url") or p.get("url")
+        for p in ((bundle or {}).get("sampled_pages") or [])
+        if p.get("identical_to_homepage_suspected_soft_404")
+    ]
 
     if not home_quality.get("usable"):
         mark("D7", "skipped", "homepage fetch is not usable content")
         mark("D8", "skipped", "homepage fetch is not usable content")
-        return _report(origin, findings, extractions, skipped, "none", home_quality, notes)
+        return _report(origin, findings, [], skipped, "none", home_quality, notes, echo_samples)
 
-    if empty_after:
-        mark("D7", "skipped", empty_after_reason)
-        mark("D8", "skipped", empty_after_reason)
-        return _report(origin, findings, extractions, skipped, "homepage_only", home_quality, notes)
+    classify_fn = None
+    crawl = SCRIPT_DIR.parents[1] / "crawl-render-audit" / "scripts"
+    if crawl.is_dir():
+        sys.path.insert(0, str(crawl))
+        try:
+            from fetch_quality import classify_fetch as classify_fn
+        except Exception:
+            classify_fn = None
+
+    scorable: list[dict[str, Any]] = []
+    for page in pages:
+        quality = page.get("fetch_quality")
+        if not (isinstance(quality, dict) and quality.get("class")) and classify_fn:
+            quality = classify_fn(
+                page.get("status"), page.get("html"), page.get("error"), page.get("url")
+            )
+            page["fetch_quality"] = quality
+        if quality and not quality.get("usable"):
+            continue
+        if page.get("role") != "homepage" and not quality and page.get("status") not in {200, 203, None}:
+            continue
+        scorable.append(page)
+
+    extractions: list[dict[str, Any]] = []
+    for page in scorable:
+        extracted = extract_jsonld(page["html"])
+        extracted["url"] = page["url"]
+        extracted["role"] = page["role"]
+        extracted["path_class"] = path_class(page["url"])
+        extracted["purpose_mismatch"] = purpose_mismatch(page["url"], extracted["types"])
+        extractions.append(extracted)
+
+    if not extractions:
+        mark("D7", "skipped", "no scorable HTML pages")
+        mark("D8", "skipped", "no scorable HTML pages")
+        return _report(origin, findings, extractions, skipped, "none", home_quality, notes, echo_samples)
 
     homepage = next((e for e in extractions if e["role"] == "homepage"), extractions[0])
     internals = [e for e in extractions if e is not homepage]
@@ -251,17 +277,25 @@ def run(target: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     else:
         coverage_pages = "none"
 
-    return _report(origin, findings, extractions, skipped, coverage_pages, home_quality, notes)
+    if empty_after:
+        for check_id in ("D7", "D8"):
+            if check_id in notes and notes[check_id].get("status") != "skipped":
+                notes[check_id]["reason"] = (
+                    (notes[check_id].get("reason") or "") + "; " + empty_after_reason
+                ).strip("; ")
+
+    return _report(origin, findings, extractions, skipped, coverage_pages, home_quality, notes, echo_samples)
 
 
 def _report(
     origin: str,
     findings: list[dict[str, Any]],
     extractions: list[dict[str, Any]],
-    skipped: list[str],
+    skipped: list[dict[str, str]],
     coverage_pages: str,
     home_quality: dict[str, Any] | None = None,
     notes: dict[str, dict[str, str]] | None = None,
+    echo_samples: list[str] | None = None,
 ) -> dict[str, Any]:
     return {
         "skill": "structured-data-audit",
@@ -274,6 +308,7 @@ def _report(
             "skipped_checks": skipped,
             "check_notes": notes or {},
             "homepage_fetch_quality": home_quality,
+            "homepage_echo_samples": echo_samples or [],
         },
     }
 
