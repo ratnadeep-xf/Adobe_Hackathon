@@ -47,10 +47,9 @@ Typical runtime is well under five minutes. Fetches stay on the audited origin e
 
 D1–D8 (crawl, structured data, and the on-site half of freshness that
 does not need search) are backed by the original n=22 Phase 2 sample
-**plus** a later 100-site validation pass (`site_research_audit.py` /
-`research_findings.json`). That 100-site script had **no web-search
-step**, so it says nothing about D9–D15. Those checks remain backed by
-the n=22 sample only. That split is expected, not an oversight.
+**plus** a later 100-site validation pass. That 100-site pass had **no
+web-search step**, so it says nothing about D9–D15. Those checks remain
+backed by the n=22 sample only. That split is expected, not an oversight.
 
 D9–D15 can also vary from run to run on the same site: they depend on
 live keyless search results, not only fetched page content.

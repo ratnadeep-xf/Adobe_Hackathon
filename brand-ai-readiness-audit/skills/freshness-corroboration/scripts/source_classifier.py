@@ -33,8 +33,8 @@ PRESS_TOKENS = (
     "bloomberg.", "forbes.", "fortune.", "cnbc.", "axios.",
     "politico.", "aljazeera.", "dw.com", "scmp.", "straitstimes.",
     "lemonde.", "elpais.", "spiegel.", "zeit.",
-    "techcrunch.", "theverge.", "wired.", "arstechnica.",
-    "zdnet.", "cnet.", "engadget.", "venturebeat.",
+    "gizmodo.", "mashable.", "pcmag.", "tomshardware.", "wired.",
+    "zdnet.", "engadget.", "venturebeat.",
 )
 
 # Consumer and B2B review / directory hosts used across industries.
